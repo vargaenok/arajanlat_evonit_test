@@ -1,16 +1,12 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def input_handling():
+    start = input("Starting Port: ")
+    finish = input("Target City: ")
+    container_type = input("Container type (20ST, 40ST, 40HC): ")
+    profit_percent = input("Profit margin: ")
+    usd_huf_change = input("USD/HUF exchange rate: ")
+    print(start, finish, container_type, profit_percent, usd_huf_change)
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    input_handling()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
