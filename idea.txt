@@ -1,0 +1,12 @@
+kell 5 input
+    kiidulo pont
+    cél pont
+    konténer tipus
+    profit százalék
+    usd huf árfolyam
+táblák/adatbázis beolvasás
+útvonal számítás (legelöbb 1 útvonal, késöbb kiterjeszteni vagy ami könyebb)
+sablon?:
+taiwan ---> rijeka ---> budapest ---> célállomás
+with "X" container the calculated cost will with "Z" profit margin:"Y" USD aka "Y * árfolyam" huf
+Excel beolvasása?
