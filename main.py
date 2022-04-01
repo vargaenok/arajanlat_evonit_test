@@ -6,7 +6,16 @@ import csv
 from config import config
 
 
-def database_loading(filename, file_list):
+def database_loading(incoming_command, file_list):
+    if incoming_command == "load_all":
+        for single_filename in file_list:
+            csv_handling(single_filename)
+        print("all .csv files are loaded")
+    else:
+        csv_handling(incoming_command)
+
+
+def csv_handling(filename):
     rows = []
     which_database = filename.split("_")
     which_database = which_database[0]
@@ -184,9 +193,13 @@ if __name__ == '__main__':
     creating_tables()
     while True:
         list_for_loading_all = files_to_scan()
-        command = input("\nPlease give me the filename to scan (Q to finish loading): ")
+        print("\nPlease give me the filename to scan")
+        command = input("(\"Q\" to finish loading; \"load_all\" to load all files): ")
         command = command.lower()
         if command == "q":
+            break
+        elif command == "load_all":
+            database_loading(command, list_for_loading_all)
             break
         database_loading(command, list_for_loading_all)
     data_input()
