@@ -203,11 +203,12 @@ def final_list(routes, container_type, profit, exchange):
         list_route.append(overall_sum)
         list_for_sort.append(list_route)
     list_for_sort = sorted(list_for_sort, key=lambda x:x[-1], reverse=False)
+    print("")
     print(f'With the the container type as {container_type}, and with {profit}% profit,')
     print(f'these are the routes it can take. (CHEAPEST on TOP!):')
     for row in list_for_sort:
         cost_with_profit = row[-1] / 100 * profit + row[-1]
-        print(f' {row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}). Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF')
+        print(f' {row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}).     Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF')
 
 
 def data_handling(start, finish, containertype):
