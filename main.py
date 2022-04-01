@@ -17,6 +17,7 @@ def database_loading(incoming_command, file_list):
 
 def csv_handling(filename):
     rows = []
+    hungarian = 0
     which_database = filename.split("_")
     which_database = which_database[0]
     with open(f'csv_files/{filename}', 'r') as file:
@@ -25,9 +26,9 @@ def csv_handling(filename):
         header = next(csvreader)
         print(header)
         print(company_row)
-        target = get_target(company_row)
+        target, hungarian = get_target(company_row)
         for row in csvreader:
-            if target == "Budapest":
+            if hungarian == 1:
                 row.pop(-1)
                 row.pop(-1)
                 row.insert(0, "")
@@ -62,13 +63,15 @@ def csv_handling(filename):
 def get_target(company_row):
     if company_row[2] == "":
         target = "Budapest"
-        return target
+        magyar = 1
+        return target, magyar
     target = company_row[2]
     target = target.split(": ")
     target = target[1]
     target = target.split(" (")
     target = target[0]
-    return target
+    magyar = 0
+    return target, magyar
 
 
 def connect():
