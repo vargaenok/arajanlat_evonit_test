@@ -6,25 +6,54 @@ import csv
 from config import config
 
 
-def database_loading(filename):
+def database_loading(filename, file_list):
     rows = []
+    which_database = filename.split("_")
+    which_database = which_database[0]
     with open(f'csv_files/{filename}', 'r') as file:
         csvreader = csv.reader(file)
         company_row = next(csvreader)
         header = next(csvreader)
+        print(header)
+        print(company_row)
         target = get_target(company_row)
         for row in csvreader:
+            if target == "Budapest":
+                row.pop(-1)
+                row.pop(-1)
+                row.insert(0, "")
             row.append(company_row[0])
             row.append(target)
-            print(row)
             rows.append(row)
-    print(company_row)
-    print(company_row[0])
     print(header)
-    print(rows)
+    print(rows[0])
+    try:
+        params = config()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        print("Iteration start")
+        count = 0
+        for row in rows:
+            insert_query = f'INSERT INTO {which_database} (start_city_short,start_city,cont_20st,cont_40hc,cont_40st,company,target_city) VALUES (%s,%s,%s,%s,%s,%s,%s);'
+            print(row)
+            cur.execute(insert_query, row)
+
+            conn.commit()
+            count += 1
+            print(count, 'Record inserted successfully into ' + which_database + ' table')
+    except (Exception, psycopg2.Error) as error:
+        print("Failed to insert data into database: ", error)
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+            print("PostgreSQL connection is closed at \"data loading\"")
 
 
 def get_target(company_row):
+    if company_row[2] == "":
+        target = "Budapest"
+        return target
     target = company_row[2]
     target = target.split(": ")
     target = target[1]
@@ -65,6 +94,74 @@ def connect():
             print('Database connection closed.')
 
 
+def creating_tables():
+    print("\n")
+    print("Creating tables for project...\n")
+    commands = (
+        """
+        DROP table IF EXISTS road CASCADE;
+        """,
+        """
+        DROP table IF EXISTS rail CASCADE;
+        """,
+        """
+        DROP table IF EXISTS sea CASCADE;
+        """,
+        """
+        CREATE TABLE sea (
+            id serial primary key,
+            start_city_short character varying(8),
+            start_city character varying(90) NOT NULL,
+            cont_20ST integer NOT NULL,
+            cont_40ST integer NOT NULL,
+            cont_40HC integer NOT NULL,
+            company character varying(90) NOT NULL,
+            target_city character varying(90) NOT NULL
+        );
+        """,
+        """ 
+        CREATE TABLE rail (
+            id serial primary key,
+            start_city_short character varying(8),
+            start_city character varying(90) NOT NULL,
+            cont_20ST integer NOT NULL,
+            cont_40ST integer NOT NULL,
+            cont_40HC integer NOT NULL,
+            company character varying(90) NOT NULL,
+            target_city character varying(90) NOT NULL
+        );
+        """,
+        """
+        CREATE TABLE road (
+            id serial primary key,
+            start_city_short character varying(8),
+            start_city character varying(90) NOT NULL,
+            cont_20ST integer NOT NULL,
+            cont_40ST integer NOT NULL,
+            cont_40HC integer NOT NULL,
+            company character varying(90) NOT NULL,
+            target_city character varying(90) NOT NULL
+        );
+        """)
+    conn = None
+    try:
+        params = config()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        # table one by one
+        for command in commands:
+            print("command started")
+            cur.execute(command)
+            print("command finished")
+        cur.close()
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+
 def data_input():
     start = input("Starting Port: ")
     finish = input("Target City: ")
@@ -79,13 +176,19 @@ def files_to_scan():
     list_o_files = os.listdir("csv_files")
     string_o_files = f'\n' .join(list_o_files)
     print(string_o_files)
+    return list_o_files
 
 
 if __name__ == '__main__':
     connect()
-    files_to_scan()
-    # input("\nPlease give me the filename to scan: ")
-    database_loading(filename='sea_penguin_deham.csv') # visszaírni sima változóra
+    creating_tables()
+    while True:
+        list_for_loading_all = files_to_scan()
+        command = input("\nPlease give me the filename to scan (Q to finish loading): ")
+        command = command.lower()
+        if command == "q":
+            break
+        database_loading(command, list_for_loading_all)
     data_input()
     print("-------->PROGRAM ENDS HERE<--------")
 
