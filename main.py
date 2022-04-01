@@ -206,7 +206,7 @@ def final_list(routes, container_type, profit, exchange):
     print(f'With the the container type as {container_type}, and with {profit}% profit,')
     print(f'these are the routes it can take. (CHEAPEST on TOP!):')
     for row in list_for_sort:
-        cost_with_profit = row[-1] / 100 * profit
+        cost_with_profit = row[-1] / 100 * profit + row[-1]
         print(f' {row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}). Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF')
 
 
