@@ -176,11 +176,62 @@ def creating_tables():
 
 def data_input():
     start = input("Starting Port: ")
-    finish = input("Target City: ")
-    container_type = input("Container type (20ST, 40ST, 40HC): ")
+    finish = " " + input("Target City: ")
+    while True:
+        container_type = input("Container type (20ST, 40ST, 40HC): ")
+        container_type = container_type.upper()
+        print(container_type)
+        if container_type == "20ST":
+            container_type = "cont_20st"
+            break
+        elif container_type == "40ST":
+            container_type = "cont_40st"
+            break
+        elif container_type == "40HC":
+            container_type = "cont_40hc"
+            break
+        else:
+            print("Please give a valid container type!")
     profit_percent = float(input("Profit margin: "))
     usd_huf_change = float(input("USD/HUF exchange rate: "))
     print(start, finish, container_type, profit_percent, usd_huf_change)
+    list_of_routes = data_handling(start, finish, container_type)
+    print(list_of_routes)
+
+
+def data_handling(start, finish, containertype):
+    conn = None
+    try:
+        params = config()
+
+        # connect to the PostgreSQL server
+        conn = psycopg2.connect(**params)
+
+        # create a cursor
+        cur = conn.cursor()
+        first_part = f'select ro.start_city as target_city, ro.company, ra.start_city as transit, ra.company, se.start_city as origin, se.company, se.{containertype}, ra.{containertype}, ro.{containertype}'
+        second_part = """
+                        from road ro 
+                        inner join rail ra on ro.target_city = ra.target_city
+                        inner join sea se on ra.start_city=se.target_city
+                        """
+        third_part = f' where ro.start_city = \'{finish}\' AND se.start_city = \'{start}\''
+        forth_part = f' group by ro.start_city, ro.company, ra.start_city, ra.company, se.start_city, se.company, se.{containertype}, ra.{containertype}, ro.{containertype}'
+        postgresql_select_query = first_part + second_part + third_part + forth_part
+        print(postgresql_select_query)
+
+        # execute a statement
+        cur.execute(postgresql_select_query)
+
+        sql_list = cur.fetchall()
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error while fetching data from PostgreSQL", error)
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
+    return sql_list
 
 
 def files_to_scan():
