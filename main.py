@@ -187,7 +187,6 @@ def data_input():
             print("Please give a valid container type!")
     profit_percent = float(input("Profit margin: "))
     usd_huf_change = float(input("USD/HUF exchange rate: "))
-    print(start, finish, container_type, profit_percent, usd_huf_change)
     list_of_routes = data_handling(start, finish, container_type_for_sql)
     final_list(list_of_routes, container_type, profit_percent, usd_huf_change)
 
@@ -230,7 +229,6 @@ def data_handling(start, finish, containertype):
         third_part = f' where ro.start_city = \'{finish}\' AND se.start_city = \'{start}\''
         forth_part = f' group by ro.start_city, ro.company, ra.start_city, ra.company, se.start_city, se.company, se.{containertype}, ra.{containertype}, ro.{containertype}'
         postgresql_select_query = first_part + second_part + third_part + forth_part
-        print(postgresql_select_query)
 
         # execute a statement
         cur.execute(postgresql_select_query)
