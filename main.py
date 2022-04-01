@@ -182,21 +182,46 @@ def data_input():
         container_type = container_type.upper()
         print(container_type)
         if container_type == "20ST":
-            container_type = "cont_20st"
+            container_type_for_sql = "cont_20st"
             break
         elif container_type == "40ST":
-            container_type = "cont_40st"
+            container_type_for_sql = "cont_40st"
             break
         elif container_type == "40HC":
-            container_type = "cont_40hc"
+            container_type_for_sql = "cont_40hc"
             break
         else:
             print("Please give a valid container type!")
     profit_percent = float(input("Profit margin: "))
     usd_huf_change = float(input("USD/HUF exchange rate: "))
     print(start, finish, container_type, profit_percent, usd_huf_change)
-    list_of_routes = data_handling(start, finish, container_type)
-    print(list_of_routes)
+    list_of_routes = data_handling(start, finish, container_type_for_sql)
+    final_list(list_of_routes, container_type, profit_percent, usd_huf_change)
+
+
+def final_list(routes, container_type, profit, exchange):
+    routes_as_list = []
+    list_for_sort = []
+    for route in routes:
+        routes_as_list.append(list(route))
+    print(routes_as_list)
+    for list_route in routes_as_list:
+        usd_sum = list_route[6] + list_route[7]
+        part_sum = usd_sum * exchange  # usd resz huf-ban
+        overall_sum = part_sum + list_route[8]
+        list_route.append(overall_sum)
+        list_for_sort.append(list_route)
+    print(list_for_sort)
+    list_for_sort = sorted(list_for_sort, key=lambda x:x[-1], reverse=False)
+    print("after sorting ")
+    print(list_for_sort)
+    print(f'With the the container type as {container_type}, and with {profit}% profit,')
+    print(f'these are the routes it can take. (CHEAPEST on TOP!):')
+    for row in list_for_sort:
+        cost_with_profit = row[-1] / 100 * profit
+        print(f' {row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}). Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF')
+
+
 
 
 def data_handling(start, finish, containertype):
