@@ -24,8 +24,6 @@ def csv_handling(filename):
         csvreader = csv.reader(file)
         company_row = next(csvreader)
         header = next(csvreader)
-        print(header)
-        print(company_row)
         target, hungarian = get_target(company_row)
         for row in csvreader:
             if hungarian == 1:
@@ -35,8 +33,6 @@ def csv_handling(filename):
             row.append(company_row[0])
             row.append(target)
             rows.append(row)
-    print(header)
-    print(rows[0])
     try:
         params = config()
         conn = psycopg2.connect(**params)
@@ -45,7 +41,6 @@ def csv_handling(filename):
         count = 0
         for row in rows:
             insert_query = f'INSERT INTO {which_database} (start_city_short,start_city,cont_20st,cont_40hc,cont_40st,company,target_city) VALUES (%s,%s,%s,%s,%s,%s,%s);'
-            print(row)
             cur.execute(insert_query, row)
 
             conn.commit()
@@ -162,9 +157,7 @@ def creating_tables():
         cur = conn.cursor()
         # table one by one
         for command in commands:
-            print("command started")
             cur.execute(command)
-            print("command finished")
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -204,24 +197,18 @@ def final_list(routes, container_type, profit, exchange):
     list_for_sort = []
     for route in routes:
         routes_as_list.append(list(route))
-    print(routes_as_list)
     for list_route in routes_as_list:
         usd_sum = list_route[6] + list_route[7]
         part_sum = usd_sum * exchange  # usd resz huf-ban
         overall_sum = part_sum + list_route[8]
         list_route.append(overall_sum)
         list_for_sort.append(list_route)
-    print(list_for_sort)
     list_for_sort = sorted(list_for_sort, key=lambda x:x[-1], reverse=False)
-    print("after sorting ")
-    print(list_for_sort)
     print(f'With the the container type as {container_type}, and with {profit}% profit,')
     print(f'these are the routes it can take. (CHEAPEST on TOP!):')
     for row in list_for_sort:
         cost_with_profit = row[-1] / 100 * profit
         print(f' {row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}). Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF')
-
-
 
 
 def data_handling(start, finish, containertype):
@@ -272,8 +259,8 @@ if __name__ == '__main__':
     creating_tables()
     while True:
         list_for_loading_all = files_to_scan()
-        print("\nPlease give me the filename to scan")
-        command = input("(\"Q\" to finish loading; \"load_all\" to load all files): ")
+        print("\nPlease give me the filename to import, or...")
+        command = input("input \"Q\" to finish loading, or \"load_all\" to load all files: ")
         command = command.lower()
         if command == "q":
             break
