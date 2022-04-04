@@ -212,9 +212,13 @@ def final_list(routes, container_type, profit, exchange):
     print("")
     print(f'With the the container type as {container_type}, and with {profit}% profit,')
     print(f'these are the routes it can take. (CHEAPEST on TOP!):')
+    count = 1  # for outline cheapest cost
     for row in list_for_sort:
         cost_with_profit = row[-1] / 100 * profit + row[-1]
-        print(f' {row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}).     Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF')
+        if count == 1:
+            print('\033[1m' + '\033[92m' + '\033[4m')  # bold green underline print
+        print(f'{row[4]} ({row[5]}) ---> {row[2]} ({row[3]}) ---> {row[0]} ({row[1]}).     Flat cost: {row[-1]} HUF. With Profit: {cost_with_profit} HUF' + '\033[0m')
+        count += 1
 
 
 def data_handling(start, finish, containertype):
