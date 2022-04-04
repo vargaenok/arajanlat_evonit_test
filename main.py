@@ -30,12 +30,14 @@ def csv_handling(filename):
             if hungarian == 1:
                 row.pop(-1)
                 row.pop(-1)
-                row.insert(0, "")
+                row.insert(0, "")  # shortname placeholder
             row.append(company_row[0])
             row.append(target)
             for part_data in row:
-                part_data = part_data.lstrip()
+                part_data = part_data.lstrip()  # removes leading whitespaces
                 spaceless_row.append(part_data)
+            if hungarian == 1:
+                spaceless_row[1], spaceless_row[6] = spaceless_row[6], spaceless_row[1]  # target position correction for hu
             rows.append(spaceless_row)
     try:
         params = config()
@@ -173,7 +175,7 @@ def creating_tables():
 
 def data_input():
     start = input("Starting Port: ")
-    finish = " " + input("Target City: ")
+    finish = input("Target City: ")
     while True:
         container_type = input("Container type (20ST, 40ST, 40HC): ")
         container_type = container_type.upper()
@@ -228,10 +230,10 @@ def data_handling(start, finish, containertype):
         first_part = f'select ro.start_city as target_city, ro.company, ra.start_city as transit, ra.company, se.start_city as origin, se.company, se.{containertype}, ra.{containertype}, ro.{containertype}'
         second_part = """
                         from road ro 
-                        inner join rail ra on ro.target_city = ra.target_city
-                        inner join sea se on ra.start_city=se.target_city
+                        inner join rail ra on ro.start_city = ra.target_city
+                        inner join sea se on ra.start_city = se.target_city
                         """
-        third_part = f' where ro.start_city = \'{finish}\' AND se.start_city = \'{start}\''
+        third_part = f' where ro.target_city = \'{finish}\' AND se.start_city = \'{start}\''
         forth_part = f' group by ro.start_city, ro.company, ra.start_city, ra.company, se.start_city, se.company, se.{containertype}, ra.{containertype}, ro.{containertype}'
         postgresql_select_query = first_part + second_part + third_part + forth_part
 
