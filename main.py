@@ -20,7 +20,7 @@ def csv_handling(filename):
     hungarian = 0
     which_database = filename.split("_")
     which_database = which_database[0]
-    with open(f'csv_files/{filename}', 'r') as file:
+    with open(f'csv_files/{filename}', 'r', encoding="utf8") as file:
         csvreader = csv.reader(file)
         company_row = next(csvreader)
         header = next(csvreader)
