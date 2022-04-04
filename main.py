@@ -26,13 +26,17 @@ def csv_handling(filename):
         header = next(csvreader)
         target, hungarian = get_target(company_row)
         for row in csvreader:
+            spaceless_row = []
             if hungarian == 1:
                 row.pop(-1)
                 row.pop(-1)
                 row.insert(0, "")
             row.append(company_row[0])
             row.append(target)
-            rows.append(row)
+            for part_data in row:
+                part_data = part_data.lstrip()
+                spaceless_row.append(part_data)
+            rows.append(spaceless_row)
     try:
         params = config()
         conn = psycopg2.connect(**params)
@@ -202,7 +206,7 @@ def final_list(routes, container_type, profit, exchange):
         overall_sum = part_sum + list_route[8]
         list_route.append(overall_sum)
         list_for_sort.append(list_route)
-    list_for_sort = sorted(list_for_sort, key=lambda x:x[-1], reverse=False)
+    list_for_sort = sorted(list_for_sort, key=lambda x: x[-1], reverse=False)
     print("")
     print(f'With the the container type as {container_type}, and with {profit}% profit,')
     print(f'these are the routes it can take. (CHEAPEST on TOP!):')
@@ -269,4 +273,3 @@ if __name__ == '__main__':
         database_loading(command, list_for_loading_all)
     data_input()
     print("-------->PROGRAM ENDS HERE<--------")
-
